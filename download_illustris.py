@@ -121,14 +121,20 @@ def generate_illustris_like_data(box_size=75, n_halos=10000, seed=123):
     }
 
 
-def create_multiple_illustris_realizations(n_realizations=5):
+def create_multiple_illustris_realizations(n_realizations=5, box_size=100, n_halos=10000):
     """
     Create multiple realizations to test statistical robustness.
+
+    box_size must match the real data you're comparing against.
+    The original mocks used 75 Mpc/h (TNG100 native size), but the
+    synthetic data snapshots use 100 Mpc/h — that mismatch caused
+    the spurious chi-squared anomaly. Default is now 100.
     """
     print("\n" + "="*60)
     print("GENERATING ILLUSTRIS-LIKE DATASETS")
     print("="*60)
-    print("\nCreating multiple realizations for statistical testing...")
+    print(f"\nBox size: {box_size} Mpc/h")
+    print("Creating multiple realizations for statistical testing...")
 
     datasets = []
 
@@ -136,8 +142,8 @@ def create_multiple_illustris_realizations(n_realizations=5):
         print(f"\nRealization {i+1}/{n_realizations}:")
 
         data = generate_illustris_like_data(
-            box_size=75,
-            n_halos=10000,
+            box_size=box_size,
+            n_halos=n_halos,
             seed=1000 + i
         )
 
@@ -163,7 +169,7 @@ def create_multiple_illustris_realizations(n_realizations=5):
 
 def main():
     """Generate Illustris-like comparison data."""
-    datasets = create_multiple_illustris_realizations(n_realizations=5)
+    datasets = create_multiple_illustris_realizations(n_realizations=5, box_size=100)
 
     print("\n" + "="*60)
     print("GENERATION COMPLETE!")

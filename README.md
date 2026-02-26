@@ -81,16 +81,24 @@ enormous and meaningless (learned that the hard way).
 
 ## Where things stand
 
-The pipeline validates cleanly. The last real run compared a z=0.1 galaxy sample against
-5 Illustris mocks and got χ² ~350,000 — which looks dramatic but is just a box size
-mismatch (data at 100 Mpc/h, mocks at 75 Mpc/h). The "anomaly" was a systematic.
+The pipeline validates cleanly. Two bugs have been identified and fixed:
 
-Next step is regenerating mocks at the correct box size and running a clean comparison.
+**Voronoi neighbor count (~25 instead of ~15.5):** This was a counting error.
+`scipy.spatial.Voronoi().regions` gives vertex indices for each cell, so `len(region)`
+was counting vertices (~25-35 for 3D Poisson), not face-adjacent neighbors (~15.5).
+The fix is to count via `ridge_points` instead — each ridge is a shared face between
+two cells. Fixed in `test_voronoi_hypotheses.py`.
 
-There's also an open question in the Voronoi analysis: every dataset tested — random,
-clustered, and real — consistently shows around 25 neighbors per Voronoi cell. The
-expected value for a 3D Poisson process is ~15.5. Probably a boundary condition artifact
-in the tessellation, but hasn't been tracked down yet.
+**Box size mismatch (χ² ~350,000):** The Illustris-like mocks were hardcoded to
+75 Mpc/h (TNG100 native box size) while the synthetic snapshots use 100 Mpc/h.
+The enormous chi-squared result was this systematic, not a physics signal. Fixed in
+`download_illustris.py` — the default is now 100 Mpc/h. Regenerate mocks before
+running a clean comparison:
+
+```bash
+python download_illustris.py
+python test_multiscale_production.py --data realistic_z0.10_matched.npz --mocks illustris_realization_*.npz
+```
 
 ---
 

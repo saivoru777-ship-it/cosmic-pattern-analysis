@@ -28,9 +28,12 @@ def compute_voronoi_neighbors(positions, sample_size=2000):
     """
     Compute Voronoi neighbor count distribution.
 
+    Neighbors = cells sharing a face, counted via ridge_points adjacency.
+    Note: vor.regions gives vertex indices (not neighbors) — do not use
+    len(region) as a neighbor count, that was the original bug giving ~25.
+
     Returns both summary statistics and full distribution.
     """
-    # Sample for computational efficiency
     if len(positions) > sample_size:
         indices = np.random.choice(len(positions), sample_size, replace=False)
         sample_points = positions[indices]
@@ -42,12 +45,12 @@ def compute_voronoi_neighbors(positions, sample_size=2000):
     try:
         vor = Voronoi(sample_points)
 
-        neighbor_counts = []
-        for region in vor.regions:
-            if -1 not in region and len(region) > 0:
-                neighbor_counts.append(len(region))
-
-        neighbor_counts = np.array(neighbor_counts)
+        # Count face-adjacent neighbors via ridge_points (correct method).
+        # Each entry in ridge_points is a pair (p1, p2) sharing a Voronoi face.
+        neighbor_counts = np.zeros(len(sample_points), dtype=int)
+        for p1, p2 in vor.ridge_points:
+            neighbor_counts[p1] += 1
+            neighbor_counts[p2] += 1
 
         return {
             'mean': np.mean(neighbor_counts),
