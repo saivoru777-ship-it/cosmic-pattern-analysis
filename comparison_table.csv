@@ -1,0 +1,5 @@
+Pattern,H₀ Features,H₁ Features,H₁ Max Persist,Ratios Near φ,Power Law Slope,Node Ratio,Filament Ratio
+Random (ΛCDM-like),1999,376,0.0965,0.53%,-1.636,78.83%,0.00%
+Evolved (Gravity),1999,344,0.0904,0.00%,-1.436,78.18%,0.00%
+Substitution Tiling,1999,474,0.0379,0.00%,-0.403,81.89%,0.00%
+Penrose-Inspired,1999,439,0.0705,0.23%,-0.899,76.75%,0.00%
